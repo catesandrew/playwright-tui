@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos-arm64:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Build standalone binary
+        run: bun build ./src/cli.tsx --compile --outfile ./dist/playwright-tui
+      - name: Rename binary
+        run: mv ./dist/playwright-tui ./dist/playwright-tui-darwin-arm64
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-tui-darwin-arm64
+          path: ./dist/playwright-tui-darwin-arm64
+
+  build-macos-x64:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Build standalone binary
+        run: bun build ./src/cli.tsx --compile --outfile ./dist/playwright-tui
+      - name: Rename binary
+        run: mv ./dist/playwright-tui ./dist/playwright-tui-darwin-x64
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-tui-darwin-x64
+          path: ./dist/playwright-tui-darwin-x64
+
+  build-linux-x64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Build standalone binary
+        run: bun build ./src/cli.tsx --compile --outfile ./dist/playwright-tui
+      - name: Rename binary
+        run: mv ./dist/playwright-tui ./dist/playwright-tui-linux-x64
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-tui-linux-x64
+          path: ./dist/playwright-tui-linux-x64
+
+  build-windows-x64:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Build standalone binary
+        run: bun build ./src/cli.tsx --compile --outfile ./dist/playwright-tui.exe
+      - name: Rename binary
+        run: mv ./dist/playwright-tui.exe ./dist/playwright-tui-windows-x64.exe
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-tui-windows-x64
+          path: ./dist/playwright-tui-windows-x64.exe
+
+  release:
+    needs:
+      - build-macos-arm64
+      - build-macos-x64
+      - build-linux-x64
+      - build-windows-x64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+          merge-multiple: true
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            ./artifacts/playwright-tui-darwin-arm64
+            ./artifacts/playwright-tui-darwin-x64
+            ./artifacts/playwright-tui-linux-x64
+            ./artifacts/playwright-tui-windows-x64.exe

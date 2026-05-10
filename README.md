@@ -29,6 +29,10 @@ A terminal UI wrapper for the [Playwright](https://playwright.dev/) test runner.
 
 ## Installation
 
+### Pre-built binaries
+
+Download a standalone executable for your platform from the [GitHub Releases](https://github.com/catesandrew/playwright-tui/releases) page. Available for macOS (arm64 & x64), Linux (x64), and Windows (x64).
+
 ### Prerequisites
 
 - [Bun](https://bun.sh/) (recommended) or [Node.js](https://nodejs.org/) 18+
