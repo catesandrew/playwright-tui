@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "playwright_tui",
+  "project_id": "3d9f81a9-cbca-4c34-9e59-0eeb8317e614"
+}
